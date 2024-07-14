@@ -11,22 +11,36 @@ class Simulador
   def comienzo
     @i = menor_tps(@tps2)
     @j = menor_tps(@tps4)
+    @k = menor_tps(@tps6)
     proximo_tps
   end
 
   def condiciones_iniciales
+    
     @ia = 0
     @ta = 0
-
+    @tps2 = Array.new(@m, 10_000)
+    @tps4 = Array.new(@n, 10_000)
+    @tps6 = Array.new(@n, 10_000)
+    @tpll = 0
+    @cp = 0
+    
+    # Variables de control
     @m = 2
     @n = 14
     @p = false
-
+    
+    # Variables de estado (COLAS)
     @ns2 = 0
     @ns4 = 0
+    @ns6 = 0
+
+    # Mesas totales atendidas
     @nt2 = 0
     @nt4 = 0
+    @nt6 = 0
 
+    # TODO RESULTADOS
     @pto2 = 0.0
     @pto4 = 0.0
     @pta2 = 0.0
@@ -37,21 +51,16 @@ class Simulador
     @sto2 = 0.0
     @sto4 = 0.0
 
-    @tps2 = Array.new(@m, 10_000)
-    @tps4 = Array.new(@n, 10_000)
-    @tpll = 0
-
+    # Tiempo de inicio y final de simulación
     @t = 0
     @tf = 180
 
+    # Tiempos de espera
     @te2 = 0.0
     @te4 = 0.0
+    @te6 = 0.0
 
-    @ito2 = Array.new(@m, 0.0)
-    @ito4 = Array.new(@n, 0.0)
-
-    @cp = 0
-
+    # AVERIGUAR QUE ES
     @na2 = 0
     @na4 = 0
 
@@ -75,6 +84,7 @@ class Simulador
     indice_mayor_valor
   end
 
+  #ACTUALIZAR
   def proximo_tps
     if @tps2[@i] <= @tps4[@j]
       llegada_o_salida2(@tps2[@i])
@@ -94,6 +104,14 @@ class Simulador
   def llegada_o_salida4(valor)
     if valor < @tpll
       atender_salida4
+    else
+      atender_llegada
+    end
+  end
+
+  def llegada_o_salida6(valor)
+    if valor < @tpll
+      atender_salida6
     else
       atender_llegada
     end
@@ -143,6 +161,15 @@ class Simulador
     x
   end
 
+  def atender_salida2
+  end
+
+  def resolver_estadia_6
+    r = rand(0.0..1.0)
+    x = 77 * r + 83
+    x
+  end
+
   def atender_llegada
     @t = @tpll
     @ia = resolver_ia
@@ -163,18 +190,24 @@ class Simulador
 
   def cant_personas
     r = rand(0.0..1.0)
-    if r <= 0.66
-      @cp = 2
-      llegada_2p
-    elsif r <= 0.69
+    if r <= 0.15
       @cp = 1
       llegada_2p
-    elsif r <= 0.85
-      @cp = 4
-      llegada_4p
-    else
+    elsif r <= 0.45
+      @cp = 2
+      llegada_2p
+    elsif r <= 0.65
       @cp = 3
       llegada_4p
+    elsif r <= 0.90
+      @cp = 4
+      llegada_4p
+    elsif r <= 0.95
+      @cp = 5
+      llegada_6p
+    else
+      @cp = 6
+      llegada_6p
     end
   end
 
@@ -275,6 +308,7 @@ class Simulador
     impresion_resultados
   end
 
+  #ACTUALIZAR
   def calculo_resultados
     @pta2 = (@na2.to_f / (@nt2 + @na2)) * 100
     @pta4 = (@na4.to_f / (@nt4 + @na4)) * 100
