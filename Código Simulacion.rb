@@ -11,7 +11,7 @@ class Simulador
   def comienzo
     @i = menor_tps(@tps2)
     @j = menor_tps(@tps4)
-    @k = menor_tps(@tps6)
+    #@k = menor_tps(@tps6) --> En teoria no vamos a usar
     proximo_tps
   end
 
@@ -21,13 +21,13 @@ class Simulador
     @ta = 0
     @tps2 = Array.new(@m, 10_000)
     @tps4 = Array.new(@n, 10_000)
-    @tps6 = Array.new(@n, 10_000)
+    #@tps6 = Array.new(@n, 10_000)
     @tpll = 0
-    @cp = 0
+    @cp = 0 # Cantidad de personas que contiene un grupo
     
     # Variables de control
-    @m = 2
-    @n = 14
+    @m = 2 #Mesas de 4
+    @n = 14 #Mesas de 2
     @p = false
     
     # Variables de estado (COLAS)
@@ -35,41 +35,41 @@ class Simulador
     @ns4 = 0
     @ns6 = 0
 
-    # Mesas totales atendidas
-    @nt2 = 0
-    @nt4 = 0
-    @nt6 = 0
+    
 
-    # TODO RESULTADOS
-    @pto2 = 0.0
-    @pto4 = 0.0
-    @pta2 = 0.0
-    @pta4 = 0.0
-    @pr24 = 0.0
-    @ps24 = 0.0
-
-    @sto2 = 0.0
-    @sto4 = 0.0
+    # Resultados --> TODO
+    @pta2 = 0.0 #Porcentaje de arrepentidos de grupos de 2.
+    @pta4 = 0.0 #Porcentaje de arrepentidos de grupos de 4.
+    @pta6 = 0.0 #Porcentaje de arrepentidos de grupos de 4.
+    @pca = 0.0 #Promedio de comensales atendidos por jornada.
 
     # Tiempo de inicio y final de simulación
     @t = 0
     @tf = 180
 
-    # Tiempos de espera
+    # Tiempos de atención?? no se, checkear
     @te2 = 0.0
     @te4 = 0.0
     @te6 = 0.0
 
-    # AVERIGUAR QUE ES
-    @na2 = 0
-    @na4 = 0
+    #Contadores
+    @pa2 = 0 #Grupos de 2 arrepentidos.
+    @pa4 = 0 #Grupos de 4 arrepentidos.
+    @pa6 = 0 #Grupos de 6 arrepentidos.
+    @a2 = false #Flag de arrepentimiento de grupo de 2.
+    @a4 = false #Flag de arrepentimiento de grupo de 4.
+    @a6 = false #Flag de arrepentimiento de grupo de 6.
+    @nt = 0 #Personas totales atendidas. TODO HAY Q CONTAR CADA VEZ Q LLEGA ALGUIEN 
+    @nt2 = 0 #Mesas totales atendidas de 2.
+    @nt4 = 0 #Mesas totales atendidas de 4.
+    @nt6 = 0 #Mesas totales atendidas de 6.
 
+    # AVERIGUAR QUE ES
     @cr2 = 0
     @cra2 = 0
-
     @c24 = 0
 
-    @a4 = false
+    
   end
 
   def menor_tps(vector)
@@ -84,7 +84,7 @@ class Simulador
     indice_mayor_valor
   end
 
-  #ACTUALIZAR
+# Si no hacemos tps 6 ya estaría, sino hay q actualizarla
   def proximo_tps
     if @tps2[@i] <= @tps4[@j]
       llegada_o_salida2(@tps2[@i])
@@ -109,13 +109,14 @@ class Simulador
     end
   end
 
-  def llegada_o_salida6(valor)
-    if valor < @tpll
-      atender_salida6
-    else
-      atender_llegada
-    end
-  end
+  
+ # def llegada_o_salida6(valor)
+ #   if valor < @tpll
+ #     atender_salida6
+ #   else
+ #     atender_llegada
+ #   end
+ # end
 
   def atender_salida2
     @t = @tps2[@i]
@@ -161,7 +162,8 @@ class Simulador
     x
   end
 
-  def atender_salida2
+  # TODO o no
+  def atender_salida6
   end
 
   def resolver_estadia_6
@@ -175,6 +177,7 @@ class Simulador
     @ia = resolver_ia
     @tpll = @t + @ia
 
+    # hay q cambiar esto para  dejar de  dejar a gente anotarse, como sabemos la hora del dia?
     if @t >= 140 && (@ns2 + @ns4) > (5 + @n + @m)
       proximo_o_final
     else
@@ -230,7 +233,7 @@ class Simulador
     if r2 > 0.2
       final_llegada_2
     else
-      @na2 += 1
+      @pa2 += 1
       proximo_o_final
     end
   end
@@ -249,7 +252,7 @@ class Simulador
         final_llegada_2
       else
         @cra2 += 1
-        @na2 += 1
+        @pa2 += 1
         proximo_o_final
         end
     end
@@ -281,8 +284,8 @@ class Simulador
       r = rand(0.0..1.0)
       @a4 = r <= 0.7
     end
-    if @a4
-      @na4 += 1
+    if @a4 # Se arrepiente
+      @pa4 += 1
       proximo_o_final
     else
       final_llegada_4
@@ -293,6 +296,22 @@ class Simulador
     @nt4 += 1
     @ns4 += 1
     proximo_o_final
+  end
+
+  def arrepentimiento_6
+    if (@ns6 - 1) <= 2
+      r = rand(0.0..1.0)
+      @a6 = r <= 0.55
+    else
+      r = rand(0.0..1.0)
+      @a6 = r <= 0.85
+    end
+    if @a6 # Se arrepiente
+      @pa6 += 1
+      proximo_o_final
+    else
+      final_llegada_6 #TODO
+    end
   end
 
   def proximo_o_final
@@ -310,10 +329,16 @@ class Simulador
 
   #ACTUALIZAR
   def calculo_resultados
-    @pta2 = (@na2.to_f / (@nt2 + @na2)) * 100
-    @pta4 = (@na4.to_f / (@nt4 + @na4)) * 100
-    @pto2 = @sto2.to_f / @m
-    @pto4 = @sto4.to_f / @n
+   
+    #Porcentajes de arrepentidos
+    @pta2 = (@pa2.to_f / (@nt2 + @pa2)) * 100
+    @pta4 = (@pa4.to_f / (@nt4 + @pa4)) * 100
+    @pta6 = (@pa6.to_f / (@nt6 + @pa6)) * 100
+
+    #TODO promedio de comensales atendidos por jornada.
+    @pca = (@nt2 + @nt4 + @nt6) /
+  
+    #ESTO ES anterior
     @pr24 = (@cr2.to_f / (@nt4 + @nt2 + @cr2)) * 100
     @ps24 = (@c24.to_f / (@nt4 + @nt2 + @c24)) * 100
   end
@@ -330,15 +355,16 @@ class Simulador
     puts ''
     puts 'PTA2: ' + format('%.2f', @pta2.to_s) + ' %'
     puts 'PTA4: ' + format('%.2f', @pta4.to_s) + ' %'
-    puts 'PTO2: ' + format('%.2f', @pto2.to_s) + ' minutos'
-    puts 'PTO4: ' + format('%.2f', @pto4.to_s) + ' minutos'
-    puts 'PR24: ' + format('%.2f', @pr24.to_s) + ' %'
-    puts 'PS24: ' + format('%.2f', @ps24.to_s) + ' %'
+    puts 'PTA6: ' + format('%.2f', @pta6.to_s) + ' %'
+   
+    #puts 'PR24: ' + format('%.2f', @pr24.to_s) + ' %'
+    #puts 'PS24: ' + format('%.2f', @ps24.to_s) + ' %'
     puts ''
-    puts 'Cantidad total de mesas: '
+    puts 'Cantidad total de mesas atendidas: '
     puts ''
     puts 'NT2: ' + @nt2.to_s
     puts 'NT4: ' + @nt4.to_s
+    puts 'NT6: ' + @nt6.to_s
     puts ''
   end
 end
