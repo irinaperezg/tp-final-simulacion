@@ -179,7 +179,7 @@ class Simulador
     @tpll = @t + @ia
 
     # hay q cambiar esto para  dejar de  dejar a gente anotarse, como sabemos la hora del dia?
-    if @t >= 140 && (@ns2 + @ns4) > (5 + @n + @m)
+    if @t%180 >= 140 && (@ns2 + @ns4 + @ns6) > (5 + @n + @m)
       proximo_o_final
     else
       cant_personas
