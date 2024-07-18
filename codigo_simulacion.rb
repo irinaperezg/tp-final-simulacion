@@ -22,6 +22,8 @@ class Simulador
     @ta = 0
     @tps2 = Array.new(@m, 10_000)
     @tps4 = Array.new(@n, 10_000)
+    @ito2 = Array.new(@m, 0)
+    @ito4 = Array.new(@n, 0)
     #@tps6 = Array.new(@n, 10_000)
     @tpll = 0
     @cp = 0 # Cantidad de personas que contiene un grupo
@@ -36,12 +38,10 @@ class Simulador
     @ns4 = 0
     @ns6 = 0
 
-    
-
     # Resultados --> TODO
     @pta2 = 0.0 #Porcentaje de arrepentidos de grupos de 2.
     @pta4 = 0.0 #Porcentaje de arrepentidos de grupos de 4.
-    @pta6 = 0.0 #Porcentaje de arrepentidos de grupos de 4.
+    @pta6 = 0.0 #Porcentaje de arrepentidos de grupos de 6.
     @pca = 0.0 #Promedio de comensales atendidos por jornada.
 
     # Tiempo de inicio y final de simulación
@@ -64,6 +64,8 @@ class Simulador
     @nt2 = 0 #Mesas totales atendidas de 2.
     @nt4 = 0 #Mesas totales atendidas de 4.
     @nt6 = 0 #Mesas totales atendidas de 6.
+    @sto2 = 0 #Sumatoria de Tiempo Ocioso de mesas de 2.
+    @sto4 = 0 #Sumatoria de Tiempo Ocioso de mesas de 4.
 
  
     @cr2 = 0 #cantidad de rechazados de  grupo de 2 en mesas de 4
@@ -179,7 +181,7 @@ class Simulador
     @tpll = @t + @ia
 
     # hay q cambiar esto para  dejar de  dejar a gente anotarse, como sabemos la hora del dia?
-    if @t%180 >= 140 && (@ns2 + @ns4 + @ns6) > (5 + @n + @m)
+    if @t % 180 >= 140 && (@ns2 + @ns4 + @ns6) > (5 + @n + @m)
       proximo_o_final
     else
       cant_personas
