@@ -385,8 +385,7 @@ class Simulador
     puts 'PTA2: ' + format('%.2f', @pta2.to_s) + ' %'
     puts 'PTA4: ' + format('%.2f', @pta4.to_s) + ' %'
     puts 'PTA6: ' + format('%.2f', @pta6.to_s) + ' %'
-    puts 'PPTO2: ' + format('%.2f', @ppto2.to_s) + ' %'
-    puts 'PPTO4: ' + format('%.2f', @ppto4.to_s) + ' %'
+    
     puts 'PTO2: ' 
     for a in 0..(M-1)
       puts 'Mesa ' + (a+1).to_s + ': ' + format('%.2f', @pto2[a].to_s) + ' %'
@@ -396,6 +395,8 @@ class Simulador
     for b in 0..(N-1)
       puts 'Mesa ' + (b+1).to_s + ': ' + format('%.2f', @pto4[b].to_s) + ' %'
     end
+    puts 'PPTO2: ' + format('%.2f', @ppto2.to_s) + ' %'
+    puts 'PPTO4: ' + format('%.2f', @ppto4.to_s) + ' %'
     puts ''
     puts 'PCA: ' + format('%.2f', @pca.to_s)
     puts 'PR24: ' + format('%.2f', @pr24.to_s) + ' %'
