@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require 'pty'
+#require 'pty'
 
 HV = 99999999999999999999999999
 TF = 1800000
