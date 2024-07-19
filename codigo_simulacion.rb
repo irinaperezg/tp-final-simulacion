@@ -362,7 +362,11 @@ class Simulador
     @pta6 = (@pa6.to_f / (@nt6 + @pa6)) * 100
 
     #promedio de comensales atendidos por jornada.
-    @pca = (@scp*3)/@t
+    @pca = (@scp*180)/@t
+
+    #Promedio de Tiempo Ocioso de Mesas
+    @pto2 = (@sto2.to_f /@N)*180/@t
+    @pto4 = (@sto4.to_f /@M)*180/@t
   
     #ESTO ES anterior
     #@pr24 = (@cr2.to_f / (@nt4 + @nt2 + @cr2)) * 100
@@ -382,6 +386,8 @@ class Simulador
     puts 'PTA2: ' + format('%.2f', @pta2.to_s) + ' %'
     puts 'PTA4: ' + format('%.2f', @pta4.to_s) + ' %'
     puts 'PTA6: ' + format('%.2f', @pta6.to_s) + ' %'
+    puts 'PTO2: ' + format('%.2f', @pto2.to_s)
+    puts 'PTO4: ' + format('%.2f', @pto4.to_s)
    
     #puts 'PR24: ' + format('%.2f', @pr24.to_s) + ' %'
     #puts 'PS24: ' + format('%.2f', @ps24.to_s) + ' %'
