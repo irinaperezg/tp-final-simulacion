@@ -388,6 +388,8 @@ class Simulador
     puts 'PTA6: ' + format('%.2f', @pta6.to_s) + ' %'
     puts 'PTO2: ' + format('%.2f', @pto2.to_s)
     puts 'PTO4: ' + format('%.2f', @pto4.to_s)
+    puts 'PCA: ' + format('%.2f', @pca.to_s)
+
    
     #puts 'PR24: ' + format('%.2f', @pr24.to_s) + ' %'
     #puts 'PS24: ' + format('%.2f', @ps24.to_s) + ' %'
