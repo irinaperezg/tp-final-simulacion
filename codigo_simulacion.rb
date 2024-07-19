@@ -21,7 +21,6 @@ class Simulador
   def comienzo
     @i = menor_tps(@tps2)
     @j = menor_tps(@tps4)
-    #@k = menor_tps(@tps6) --> En teoria no vamos a usar
     proximo_tps
   end
 
@@ -33,47 +32,51 @@ class Simulador
     @tps4 = Array.new(N, HV)
     @ito2 = Array.new(M, 0)
     @ito4 = Array.new(N, 0)
-    #@tps6 = Array.new(N, HV)
+
     @tpll = 0
     @cp = 0 # Cantidad de personas que contiene un grupo
+    
     # Variables de estado (COLAS)
     @ns2 = 0
     @ns4 = 0
     @ns6 = 0
 
-    # Resultados --> TODO
+    # Resultados 
     @pta2 = 0.0 #Porcentaje de arrepentidos de grupos de 2.
     @pta4 = 0.0 #Porcentaje de arrepentidos de grupos de 4.
     @pta6 = 0.0 #Porcentaje de arrepentidos de grupos de 6.
     @pca = 0.0 #Promedio de comensales atendidos por jornada.
     @pto2 = Array.new(M, 0) 
     @pto4 = Array.new(N, 0)
-    @ppto2 = 0
-    @ppto4 = 0
+    @pto2 = 0
+    @pto4 = 0
     
     # Tiempo de inicio y final de simulación
     @t = 0
 
-    # Tiempos de atención?? no se, checkear
+    # Tiempos de permanencia
     @te2 = 0.0
     @te4 = 0.0
     @te6 = 0.0
 
-    #Contadores
+    # Contadores
     @pa2 = 0 #Grupos de 2 arrepentidos.
     @pa4 = 0 #Grupos de 4 arrepentidos.
     @pa6 = 0 #Grupos de 6 arrepentidos.
+
     @a2 = false #Flag de arrepentimiento de grupo de 2.
     @a4 = false #Flag de arrepentimiento de grupo de 4.
     @a6 = false #Flag de arrepentimiento de grupo de 6.
-    @scp = 0 #Personas totales atendidas. TODO HAY Q CONTAR CADA VEZ Q LLEGA ALGUIEN 
+
+    @scp = 0 #Personas totales atendidas. 
     @nt2 = 0 #Mesas totales atendidas de 2.
     @nt4 = 0 #Mesas totales atendidas de 4.
     @nt6 = 0 #Mesas totales atendidas de 6.
+
     @sto2 = Array.new(M, 0) #Sumatoria de Tiempo Ocioso de mesas de 2.
     @sto4 = Array.new(N, 0) #Sumatoria de Tiempo Ocioso de mesas de 4.
+
     @cr2 = 0 #cantidad de rechazados de  grupo de 2 en mesas de 4
-    #@cra2 = 0 #cantidad de rechazados de  grupo de 2 en mesas de 4 arrepentidos
     @c24 = 0 #cantidad aceptada de grupo de 2 en mesas de 4
 
   end
@@ -90,7 +93,6 @@ class Simulador
     indice_mayor_valor
   end
 
-# Si no hacemos tps 6 ya estaría, sino hay q actualizarla
   def proximo_tps
     if @tps2[@i] <= @tps4[@j]
       llegada_o_salida2(@tps2[@i])
@@ -114,15 +116,6 @@ class Simulador
       atender_llegada
     end
   end
-
-
- # def llegada_o_salida6(valor)
- #   if valor < @tpll
- #     atender_salida6
- #   else
- #     atender_llegada
- #   end
- # end
 
   def atender_salida2
     @t = @tps2[@i]
@@ -168,10 +161,6 @@ class Simulador
     x
   end
 
-  # TODO o no
-  def atender_salida6
-  end
-
   def resolver_estadia_6
     r = rand(0.0..1.0)
     x = 77 * r + 83
@@ -185,7 +174,7 @@ class Simulador
 
     # hay q cambiar esto para  dejar de  dejar a gente anotarse, como sabemos la hora del dia?
     if @t % 180 >= 140 && (@ns2 + @ns4 + @ns6) > (5 + N + M)
-
+      proximo_o_final
     else
       cant_personas
     end
@@ -240,7 +229,6 @@ class Simulador
       final_llegada_2
     else
       @pa2 += 1
-
     end
   end
 
@@ -252,10 +240,9 @@ class Simulador
       @tps4[@j] = @t + @te2
       @sto4[@j] = @t - @ito4[@i]
       final_llegada_4
-    else #flag desacvtivado
+    else #flag desactivado
       @cr2 += 1
       arrepentimiento_2
-
     end
   end
 
@@ -263,7 +250,6 @@ class Simulador
     @nt2 += 1
     @ns2 += 1
     @scp += @cp
-
   end
 
   def llegada_4p
@@ -288,7 +274,6 @@ class Simulador
     end
     if @a4 # Se arrepiente
       @pa4 += 1
-
     else
       final_llegada_4
     end
@@ -298,7 +283,6 @@ class Simulador
     @nt4 += 1
     @ns4 += 1
     @scp += @cp
-
   end
 
   def llegada_6p
@@ -317,7 +301,6 @@ class Simulador
         @tps4[@j] = @t + @te6
       else
         @ns6 += 1
-
       end
     else
       arrepentimiento_6
@@ -334,12 +317,10 @@ class Simulador
     end
     if @a6 # Se arrepiente
       @pa6 += 1
-
     else
       @nt6 += 1
       @ns6 += 1
       @scp += @cp
-
     end
   end
 
@@ -367,7 +348,7 @@ class Simulador
     #promedio de comensales atendidos por jornada.
     @pca = (@scp*180)/@t
 
-    #Promedio de Porcentaje de Tiempo Ocioso de Mesas
+    # Porcentaje de Tiempo Ocioso de Mesas
     for i in 0..(M-1)
      @ppto2 += @sto2[i]
     end
@@ -386,7 +367,7 @@ class Simulador
     for j in 0..(N-1)
      @pto4[j] = (@sto4[j].to_f / @t)*100
     end  
-    #ESTO ES anterior
+    
     @pr24 = (@cr2.to_f / (@nt4 + @nt2 + @nt6 + @cr2)) * 100
     @ps24 = (@c24.to_f / (@nt4 + @nt2 + @nt6 + @c24)) * 100
   end
