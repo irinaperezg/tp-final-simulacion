@@ -3,7 +3,7 @@
 require 'pty'
 
 HV = 99999999999999999999999999
-TF = 4860
+TF = 1800000
 
 # Variables de control
 M = 2 #Mesas de 4
@@ -12,7 +12,10 @@ P = false
 class Simulador
   def simular
     condiciones_iniciales
-    comienzo
+    while @t < TF
+      comienzo
+    end
+    resultados
   end
 
   def comienzo
@@ -23,7 +26,7 @@ class Simulador
   end
 
   def condiciones_iniciales
-    
+
     @ia = 0
     @ta = 0
     @tps2 = Array.new(M, HV)
@@ -33,7 +36,7 @@ class Simulador
     #@tps6 = Array.new(N, HV)
     @tpll = 0
     @cp = 0 # Cantidad de personas que contiene un grupo
-    
+
     # Variables de estado (COLAS)
     @ns2 = 0
     @ns4 = 0
@@ -64,15 +67,15 @@ class Simulador
     @nt2 = 0 #Mesas totales atendidas de 2.
     @nt4 = 0 #Mesas totales atendidas de 4.
     @nt6 = 0 #Mesas totales atendidas de 6.
-    @sto2 = Array.new(M, 0) #Sumatoria de Tiempo Ocioso de mesas de 2.
-    @sto4 = Array.new(N, 0) #Sumatoria de Tiempo Ocioso de mesas de 4.
+    @sto2 = 0 #Sumatoria de Tiempo Ocioso de mesas de 2.
+    @sto4 = 0 #Sumatoria de Tiempo Ocioso de mesas de 4.
 
- 
+
     @cr2 = 0 #cantidad de rechazados de  grupo de 2 en mesas de 4
     #@cra2 = 0 #cantidad de rechazados de  grupo de 2 en mesas de 4 arrepentidos
     @c24 = 0 #cantidad aceptada de grupo de 2 en mesas de 4
 
-    
+
   end
 
   def menor_tps(vector)
@@ -112,7 +115,7 @@ class Simulador
     end
   end
 
-  
+
  # def llegada_o_salida6(valor)
  #   if valor < @tpll
  #     atender_salida6
@@ -131,7 +134,7 @@ class Simulador
       @ito2[@i] = @t
       @tps2[@i] = HV
     end
-    proximo_o_final
+
   end
 
   def resolver_estadia_2
@@ -156,7 +159,7 @@ class Simulador
       @ito4[@j] = @t
       @tps4[@j] = HV
     end
-    proximo_o_final
+
   end
 
   def resolver_estadia_4
@@ -182,7 +185,7 @@ class Simulador
 
     # hay q cambiar esto para  dejar de  dejar a gente anotarse, como sabemos la hora del dia?
     if @t % 180 >= 140 && (@ns2 + @ns4 + @ns6) > (5 + N + M)
-      proximo_o_final
+
     else
       cant_personas
     end
@@ -237,7 +240,7 @@ class Simulador
       final_llegada_2
     else
       @pa2 += 1
-      proximo_o_final
+
     end
   end
 
@@ -252,7 +255,7 @@ class Simulador
     else #flag desacvtivado
       @cr2 += 1
       arrepentimiento_2
-      proximo_o_final
+
     end
   end
 
@@ -260,7 +263,7 @@ class Simulador
     @nt2 += 1
     @ns2 += 1
     @scp += @cp
-    proximo_o_final
+
   end
 
   def llegada_4p
@@ -285,7 +288,7 @@ class Simulador
     end
     if @a4 # Se arrepiente
       @pa4 += 1
-      proximo_o_final
+
     else
       final_llegada_4
     end
@@ -295,7 +298,7 @@ class Simulador
     @nt4 += 1
     @ns4 += 1
     @scp += @cp
-    proximo_o_final
+
   end
 
   def llegada_6p
@@ -314,7 +317,7 @@ class Simulador
         @tps4[@j] = @t + @te6
       else
         @ns6 += 1
-        proximo_o_final
+
       end
     else
       arrepentimiento_6
@@ -331,12 +334,12 @@ class Simulador
     end
     if @a6 # Se arrepiente
       @pa6 += 1
-      proximo_o_final
+
     else
       @nt6 += 1
       @ns6 += 1
       @scp += @cp
-      proximo_o_final
+
     end
   end
 
@@ -355,7 +358,7 @@ class Simulador
 
   #ACTUALIZAR
   def calculo_resultados
-   
+
     #Porcentajes de arrepentidos
     @pta2 = (@pa2.to_f / (@nt2 + @pa2)) * 100
     @pta4 = (@pa4.to_f / (@nt4 + @pa4)) * 100
@@ -365,13 +368,13 @@ class Simulador
     @pca = (@scp*180)/@t
 
     #Porcentaje de Tiempo Ocioso de Mesas
-    @pto2 = (@sto2.to_f /@t)*100
-    @pto4 = (@sto4.to_f /@t)*100
-    
+    #@pto2 = (@sto2.to_f /@t)*100
+    #@pto4 = (@sto4.to_f /@t)*100
+
     #for i in 0..(M-1)
     #  @pto2[i] = (@sto2[i].to_f /@t)*100
     #end
-    
+
     #for j in 0..(N-1)
     #  @pto4[j] = (@sto4[j].to_f /@t)*100
     #end  
@@ -393,8 +396,8 @@ class Simulador
     puts 'PTA2: ' + format('%.2f', @pta2.to_s) + ' %'
     puts 'PTA4: ' + format('%.2f', @pta4.to_s) + ' %'
     puts 'PTA6: ' + format('%.2f', @pta6.to_s) + ' %'
-    puts 'PTO2: ' + format('%.2f', @pto2.to_s) + ' %'
-    puts 'PTO4: ' + format('%.2f', @pto4.to_s) + ' %'
+    #puts 'PTO2: ' + format('%.2f', @pto2.to_s) + ' %'
+    #puts 'PTO4: ' + format('%.2f', @pto4.to_s) + ' %'
     #for i in 0..(@m-1)
     #  puts 'Mesa ' i+1 ': ' + format('%.2f', @pto2[i].to_s)
     #end
@@ -413,4 +416,10 @@ class Simulador
     puts 'NT6: ' + @nt6.to_s
     puts ''
   end
+
+# Create an instance of the Simulador class
+simulador = Simulador.new
+# Start the simulation
+simulador.simular
+
 end
