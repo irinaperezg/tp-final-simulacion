@@ -6,9 +6,9 @@ HV = 99999999999999999999999999
 TF = 1800000
 
 # Variables de control
-M = 2 #Mesas de 4
-N = 14 #Mesas de 2
-P = false
+M = 5 #Mesas de 2
+N = 12 #Mesas de 4
+P = true
 class Simulador
   def simular
     condiciones_iniciales
@@ -368,8 +368,8 @@ class Simulador
     @pca = (@scp*180)/@t
 
     #Porcentaje de Tiempo Ocioso de Mesas
-    #@pto2 = (@sto2.to_f /@t)*100
-    #@pto4 = (@sto4.to_f /@t)*100
+    @pto2 = (@sto2.to_f / @t)*100
+    @pto4 = (@sto4.to_f / @t)*100
 
     #for i in 0..(M-1)
     #  @pto2[i] = (@sto2[i].to_f /@t)*100
@@ -396,8 +396,8 @@ class Simulador
     puts 'PTA2: ' + format('%.2f', @pta2.to_s) + ' %'
     puts 'PTA4: ' + format('%.2f', @pta4.to_s) + ' %'
     puts 'PTA6: ' + format('%.2f', @pta6.to_s) + ' %'
-    #puts 'PTO2: ' + format('%.2f', @pto2.to_s) + ' %'
-    #puts 'PTO4: ' + format('%.2f', @pto4.to_s) + ' %'
+    puts 'PTO2: ' + format('%.2f', @pto2.to_s) + ' %'
+    puts 'PTO4: ' + format('%.2f', @pto4.to_s) + ' %'
     #for i in 0..(@m-1)
     #  puts 'Mesa ' i+1 ': ' + format('%.2f', @pto2[i].to_s)
     #end
