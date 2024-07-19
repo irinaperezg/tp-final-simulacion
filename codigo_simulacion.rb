@@ -364,13 +364,13 @@ class Simulador
     #promedio de comensales atendidos por jornada.
     @pca = (@scp*180)/@t
 
-    #Promedio de Tiempo Ocioso de Mesas
-    @pto2 = (@sto2.to_f /@N)*180/@t
-    @pto4 = (@sto4.to_f /@M)*180/@t
+    #Porcentaje de Tiempo Ocioso de Mesas
+    @pto2 = (@sto2.to_f /@t)*100
+    @pto4 = (@sto4.to_f /@t)*100
   
     #ESTO ES anterior
-    #@pr24 = (@cr2.to_f / (@nt4 + @nt2 + @cr2)) * 100
-   # @ps24 = (@c24.to_f / (@nt4 + @nt2 + @c24)) * 100
+    @pr24 = (@cr2.to_f / (@nt4 + @nt2 + @nt6 + @cr2)) * 100
+    @ps24 = (@c24.to_f / (@nt4 + @nt2 + @nt6 + @c24)) * 100
   end
 
   def impresion_resultados
@@ -389,10 +389,8 @@ class Simulador
     puts 'PTO2: ' + format('%.2f', @pto2.to_s)
     puts 'PTO4: ' + format('%.2f', @pto4.to_s)
     puts 'PCA: ' + format('%.2f', @pca.to_s)
-
-   
-    #puts 'PR24: ' + format('%.2f', @pr24.to_s) + ' %'
-    #puts 'PS24: ' + format('%.2f', @ps24.to_s) + ' %'
+    puts 'PR24: ' + format('%.2f', @pr24.to_s) + ' %'
+    puts 'PS24: ' + format('%.2f', @ps24.to_s) + ' %'
     puts ''
     puts 'Cantidad total de mesas atendidas: '
     puts ''
