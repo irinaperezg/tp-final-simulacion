@@ -3,6 +3,12 @@
 require 'pty'
 
 HV = 99999999999999999999999999
+TF = 4860
+
+# Variables de control
+M = 2 #Mesas de 4
+N = 14 #Mesas de 2
+P = false
 class Simulador
   def simular
     condiciones_iniciales
@@ -20,18 +26,13 @@ class Simulador
     
     @ia = 0
     @ta = 0
-    @tps2 = Array.new(@m, HV)
-    @tps4 = Array.new(@n, HV)
-    @ito2 = Array.new(@m, 0)
-    @ito4 = Array.new(@n, 0)
-    #@tps6 = Array.new(@n, HV)
+    @tps2 = Array.new(M, HV)
+    @tps4 = Array.new(N, HV)
+    @ito2 = Array.new(M, 0)
+    @ito4 = Array.new(N, 0)
+    #@tps6 = Array.new(N, HV)
     @tpll = 0
     @cp = 0 # Cantidad de personas que contiene un grupo
-    
-    # Variables de control
-    m = 2 #Mesas de 4
-    n = 14 #Mesas de 2
-    p = false
     
     # Variables de estado (COLAS)
     @ns2 = 0
@@ -46,7 +47,6 @@ class Simulador
 
     # Tiempo de inicio y final de simulación
     @t = 0
-    tf = 180
 
     # Tiempos de atención?? no se, checkear
     @te2 = 0.0
@@ -64,8 +64,8 @@ class Simulador
     @nt2 = 0 #Mesas totales atendidas de 2.
     @nt4 = 0 #Mesas totales atendidas de 4.
     @nt6 = 0 #Mesas totales atendidas de 6.
-    @sto2 = Array.new(@m, 0) #Sumatoria de Tiempo Ocioso de mesas de 2.
-    @sto4 = Array.new(@n, 0) #Sumatoria de Tiempo Ocioso de mesas de 4.
+    @sto2 = Array.new(M, 0) #Sumatoria de Tiempo Ocioso de mesas de 2.
+    @sto4 = Array.new(N, 0) #Sumatoria de Tiempo Ocioso de mesas de 4.
 
  
     @cr2 = 0 #cantidad de rechazados de  grupo de 2 en mesas de 4
@@ -124,7 +124,7 @@ class Simulador
   def atender_salida2
     @t = @tps2[@i]
     @ns2 -= 1
-    if @ns2 < @m
+    if @ns2 < M
       @te2 = resolver_estadia_2
       @tps2[@i] = @t + @te2
     else
@@ -143,10 +143,10 @@ class Simulador
   def atender_salida4
     @t = @tps4[@j]
     @ns4 -= 1
-    if @ns4 <= @n
+    if @ns4 <= N
       @te4 = resolver_estadia_4
       @tps4[@j] = @t + @te4
-    elsif @ns2 >= @m && @p == true
+    elsif @ns2 >= M && P == true
       @ns2 -= 1
       @ns4 += 1
       @c24 += 1
@@ -181,7 +181,7 @@ class Simulador
     @tpll = @t + @ia
 
     # hay q cambiar esto para  dejar de  dejar a gente anotarse, como sabemos la hora del dia?
-    if @t % 180 >= 140 && (@ns2 + @ns4 + @ns6) > (5 + @n + @m)
+    if @t % 180 >= 140 && (@ns2 + @ns4 + @ns6) > (5 + N + M)
       proximo_o_final
     else
       cant_personas
@@ -218,13 +218,13 @@ class Simulador
   end
 
   def llegada_2p
-    if @ns2 <= @m
+    if @ns2 <= M
       @i = tps_hv(@tps2)
       @te2 = resolver_estadia_2
       @tps2[@i] = @t + @te2
       @sto2 += (@t - @ito2[@i])
       final_llegada_2
-    elsif @ns4 <= @n
+    elsif @ns4 <= N
       mesa_2_en_mesa_4
     else
       arrepentimiento_2
@@ -242,7 +242,7 @@ class Simulador
   end
 
   def mesa_2_en_mesa_4
-    if @p #flag activado
+    if P #flag activado
       @c24 += 1
       @j = tps_hv(@tps4)
       @te2 = resolver_estadia_2
@@ -264,7 +264,7 @@ class Simulador
   end
 
   def llegada_4p
-    if @ns4 <= @n
+    if @ns4 <= N
       @j = tps_hv(@tps4)
       @sto4 += (@t - @ito4[@j])
       @te4 = resolver_estadia_4
@@ -276,7 +276,7 @@ class Simulador
   end
 
   def arrepentimiento_4
-    if (@ns4 - @n) <= 2
+    if (@ns4 - N) <= 2
       r = rand(0.0..1.0)
       @a4 = r <= 0.25
     else
@@ -302,7 +302,7 @@ class Simulador
     if @ns6 == 0
       @nt6 += 1
       @scp += @cp
-      if @ns4 < @n && @ns2 < @m
+      if @ns4 < N && @ns2 < M
         @ns2 += 1
         @ns4 += 1
         @i = tps_hv(@tps2)
@@ -341,7 +341,7 @@ class Simulador
   end
 
   def proximo_o_final
-    if @t >= @tf
+    if @t >= TF
       resultados
     else
       comienzo
@@ -368,11 +368,11 @@ class Simulador
     #@pto2 = (@sto2.to_f /@t)*100
     #@pto4 = (@sto4.to_f /@t)*100
     
-    for i in 0..(@m-1)
+    for i in 0..(M-1)
       @pto2[i] = (@sto2[i].to_f /@t)*100
     end
     
-    for j in 0..(@n-1)
+    for j in 0..(N-1)
       @pto4[j] = (@sto4[j].to_f /@t)*100
     end  
     #ESTO ES anterior
@@ -384,9 +384,9 @@ class Simulador
     puts ''
     puts 'Variables de control:'
     puts ''
-    puts 'N: ' + @n.to_s
-    puts 'M: ' + @m.to_s
-    puts 'P: ' + @p.to_s
+    puts 'N: ' + N.to_s
+    puts 'M: ' + M.to_s
+    puts 'P: ' + P.to_s
     puts ''
     puts 'Resultados: '
     puts ''
