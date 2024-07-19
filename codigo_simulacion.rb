@@ -6,9 +6,9 @@ HV = 99999999999999999999999999
 TF = 1800000
 
 # Variables de control
-M = 20 #Mesas de 2
-N = 5 #Mesas de 4
-P = true
+M = 26 #Mesas de 2
+N = 2 #Mesas de 4
+P = 1
 class Simulador
   def simular
     condiciones_iniciales
@@ -48,9 +48,9 @@ class Simulador
     @pca = 0.0 #Promedio de comensales atendidos por jornada.
     @pto2 = Array.new(M, 0) 
     @pto4 = Array.new(N, 0)
-    @pto2 = 0
-    @pto4 = 0
-    
+    @ppto2 = 0
+    @ppto4 = 0
+   
     # Tiempo de inicio y final de simulación
     @t = 0
 
