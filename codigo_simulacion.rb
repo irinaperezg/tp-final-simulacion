@@ -6,8 +6,8 @@ HV = 99999999999999999999999999
 TF = 1800000
 
 # Variables de control
-M = 5 #Mesas de 2
-N = 12 #Mesas de 4
+M = 20 #Mesas de 2
+N = 5 #Mesas de 4
 P = true
 class Simulador
   def simular
@@ -36,7 +36,6 @@ class Simulador
     #@tps6 = Array.new(N, HV)
     @tpll = 0
     @cp = 0 # Cantidad de personas que contiene un grupo
-
     # Variables de estado (COLAS)
     @ns2 = 0
     @ns4 = 0
@@ -47,7 +46,11 @@ class Simulador
     @pta4 = 0.0 #Porcentaje de arrepentidos de grupos de 4.
     @pta6 = 0.0 #Porcentaje de arrepentidos de grupos de 6.
     @pca = 0.0 #Promedio de comensales atendidos por jornada.
-
+    @pto2 = Array.new(M, 0) 
+    @pto4 = Array.new(N, 0)
+    @ppto2 = 0
+    @ppto4 = 0
+    
     # Tiempo de inicio y final de simulación
     @t = 0
 
@@ -67,14 +70,11 @@ class Simulador
     @nt2 = 0 #Mesas totales atendidas de 2.
     @nt4 = 0 #Mesas totales atendidas de 4.
     @nt6 = 0 #Mesas totales atendidas de 6.
-    @sto2 = 0 #Sumatoria de Tiempo Ocioso de mesas de 2.
-    @sto4 = 0 #Sumatoria de Tiempo Ocioso de mesas de 4.
-
-
+    @sto2 = Array.new(M, 0) #Sumatoria de Tiempo Ocioso de mesas de 2.
+    @sto4 = Array.new(N, 0) #Sumatoria de Tiempo Ocioso de mesas de 4.
     @cr2 = 0 #cantidad de rechazados de  grupo de 2 en mesas de 4
     #@cra2 = 0 #cantidad de rechazados de  grupo de 2 en mesas de 4 arrepentidos
     @c24 = 0 #cantidad aceptada de grupo de 2 en mesas de 4
-
 
   end
 
@@ -225,7 +225,7 @@ class Simulador
       @i = tps_hv(@tps2)
       @te2 = resolver_estadia_2
       @tps2[@i] = @t + @te2
-      @sto2 += (@t - @ito2[@i])
+      @sto2[@i] = (@t - @ito2[@i])
       final_llegada_2
     elsif @ns4 <= N
       mesa_2_en_mesa_4
@@ -250,7 +250,7 @@ class Simulador
       @j = tps_hv(@tps4)
       @te2 = resolver_estadia_2
       @tps4[@j] = @t + @te2
-      @sto4 += (@t - @ito4[@i])
+      @sto4[@j] = @t - @ito4[@i]
       final_llegada_4
     else #flag desacvtivado
       @cr2 += 1
@@ -269,7 +269,7 @@ class Simulador
   def llegada_4p
     if @ns4 <= N
       @j = tps_hv(@tps4)
-      @sto4 += (@t - @ito4[@j])
+      @sto4[@j] = @t - @ito4[@j]
       @te4 = resolver_estadia_4
       @tps4[@j] = @t + @te4
       final_llegada_4
@@ -310,8 +310,8 @@ class Simulador
         @ns4 += 1
         @i = tps_hv(@tps2)
         @j = tps_hv(@tps4)
-        @sto2 += (@t - @ito2[@i])
-        @sto4 += (@t - @ito4[@j])
+        @sto2[@i] = @t - @ito2[@i]
+        @sto4[@j] = @t - @ito4[@j]
         @te6 = resolver_estadia_6
         @tps2[@i] = @t + @te6
         @tps4[@j] = @t + @te6
@@ -367,17 +367,25 @@ class Simulador
     #promedio de comensales atendidos por jornada.
     @pca = (@scp*180)/@t
 
-    #Porcentaje de Tiempo Ocioso de Mesas
-    @pto2 = (@sto2.to_f / @t)*100
-    @pto4 = (@sto4.to_f / @t)*100
+    #Promedio de Porcentaje de Tiempo Ocioso de Mesas
+    for i in 0..(M-1)
+     @ppto2 += @sto2[i]
+    end
+    @ppto2 = (@ppto2/ (M * @t))*100
+    
+    for j in 0..(N-1)
+     @ppto4 += @sto4[j]
+    end 
+    @ppto4 = (@ppto4/ (N * @t))*100
 
-    #for i in 0..(M-1)
-    #  @pto2[i] = (@sto2[i].to_f /@t)*100
-    #end
+    #Porcentaje de Tiempo Ocioso de Cada Mesa
+    for i in 0..(M-1)
+     @pto2[i] = (@sto2[i].to_f / @t)*100
+    end
 
-    #for j in 0..(N-1)
-    #  @pto4[j] = (@sto4[j].to_f /@t)*100
-    #end  
+    for j in 0..(N-1)
+     @pto4[j] = (@sto4[j].to_f / @t)*100
+    end  
     #ESTO ES anterior
     @pr24 = (@cr2.to_f / (@nt4 + @nt2 + @nt6 + @cr2)) * 100
     @ps24 = (@c24.to_f / (@nt4 + @nt2 + @nt6 + @c24)) * 100
@@ -387,8 +395,8 @@ class Simulador
     puts ''
     puts 'Variables de control:'
     puts ''
-    puts 'N: ' + N.to_s
-    puts 'M: ' + M.to_s
+    puts 'Mesas de 2 (M): ' + M.to_s
+    puts 'Mesas de 4 (N): ' + N.to_s
     puts 'P: ' + P.to_s
     puts ''
     puts 'Resultados: '
@@ -396,15 +404,18 @@ class Simulador
     puts 'PTA2: ' + format('%.2f', @pta2.to_s) + ' %'
     puts 'PTA4: ' + format('%.2f', @pta4.to_s) + ' %'
     puts 'PTA6: ' + format('%.2f', @pta6.to_s) + ' %'
-    puts 'PTO2: ' + format('%.2f', @pto2.to_s) + ' %'
-    puts 'PTO4: ' + format('%.2f', @pto4.to_s) + ' %'
-    #for i in 0..(@m-1)
-    #  puts 'Mesa ' i+1 ': ' + format('%.2f', @pto2[i].to_s)
-    #end
-    #puts 'PTO4: '
-    #for j in 0..(@n-1)
-    #  puts 'Mesa ' j+1 ': ' + format('%.2f', @pto4[j].to_s)
-    #end
+    puts 'PPTO2: ' + format('%.2f', @ppto2.to_s) + ' %'
+    puts 'PPTO4: ' + format('%.2f', @ppto4.to_s) + ' %'
+    puts 'PTO2: ' 
+    for a in 0..(M-1)
+      puts 'Mesa ' + (a+1).to_s + ': ' + format('%.2f', @pto2[a].to_s) + ' %'
+    end
+    
+    puts 'PTO4: '
+    for b in 0..(N-1)
+      puts 'Mesa ' + (b+1).to_s + ': ' + format('%.2f', @pto4[b].to_s) + ' %'
+    end
+    puts ''
     puts 'PCA: ' + format('%.2f', @pca.to_s)
     puts 'PR24: ' + format('%.2f', @pr24.to_s) + ' %'
     puts 'PS24: ' + format('%.2f', @ps24.to_s) + ' %'
