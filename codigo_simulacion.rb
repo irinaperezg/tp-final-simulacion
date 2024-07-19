@@ -222,7 +222,7 @@ class Simulador
       @i = tps_hv(@tps2)
       @te2 = resolver_estadia_2
       @tps2[@i] = @t + @te2
-      @sto2 += (@t - @ito2[@i])
+      @sto2[@i] += (@t - @ito2[@i])
       final_llegada_2
     elsif @ns4 <= @n
       mesa_2_en_mesa_4
@@ -247,7 +247,7 @@ class Simulador
       @j = tps_hv(@tps4)
       @te2 = resolver_estadia_2
       @tps4[@j] = @t + @te2
-      @sto4 += (@t - @ito4[@i])
+      @sto4[@i] += (@t - @ito4[@i])
       final_llegada_4
     else #flag desacvtivado
       @cr2 += 1
@@ -266,7 +266,7 @@ class Simulador
   def llegada_4p
     if @ns4 <= @n
       @j = tps_hv(@tps4)
-      @sto4 += (@t - @ito4[@j])
+      @sto4[@j] += (@t - @ito4[@j])
       @te4 = resolver_estadia_4
       @tps4[@j] = @t + @te4
       final_llegada_4
@@ -307,8 +307,8 @@ class Simulador
         @ns4 += 1
         @i = tps_hv(@tps2)
         @j = tps_hv(@tps4)
-        @sto2 += (@t - @ito2[@i])
-        @sto4 += (@t - @ito4[@j])
+        @sto2[@i] += (@t - @ito2[@i])
+        @sto4[@j] += (@t - @ito4[@j])
         @te6 = resolver_estadia_6
         @tps2[@i] = @t + @te6
         @tps4[@j] = @t + @te6
@@ -393,8 +393,14 @@ class Simulador
     puts 'PTA2: ' + format('%.2f', @pta2.to_s) + ' %'
     puts 'PTA4: ' + format('%.2f', @pta4.to_s) + ' %'
     puts 'PTA6: ' + format('%.2f', @pta6.to_s) + ' %'
-    puts 'PTO2: ' + format('%.2f', @pto2.to_s)
-    puts 'PTO4: ' + format('%.2f', @pto4.to_s)
+    puts 'PTO2: '
+    for i in 0..(@m-1)
+      puts 'Mesa ' i ': ' + format('%.2f', @pto2[i].to_s)
+    end
+    puts 'PTO4: '
+    for j in 0..(@n-1)
+      puts 'Mesa ' j ': ' + format('%.2f', @pto4[j].to_s)
+    end
     puts 'PCA: ' + format('%.2f', @pca.to_s)
     puts 'PR24: ' + format('%.2f', @pr24.to_s) + ' %'
     puts 'PS24: ' + format('%.2f', @ps24.to_s) + ' %'
