@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
-require 'pry'
+require 'pty'
 
-HV = 10.000
+HV = 99999999999999999999999999
 class Simulador
   def simular
     condiciones_iniciales
@@ -20,18 +20,18 @@ class Simulador
     
     @ia = 0
     @ta = 0
-    @tps2 = Array.new(@m, 10_000)
-    @tps4 = Array.new(@n, 10_000)
+    @tps2 = Array.new(@m, HV)
+    @tps4 = Array.new(@n, HV)
     @ito2 = Array.new(@m, 0)
     @ito4 = Array.new(@n, 0)
-    #@tps6 = Array.new(@n, 10_000)
+    #@tps6 = Array.new(@n, HV)
     @tpll = 0
     @cp = 0 # Cantidad de personas que contiene un grupo
     
     # Variables de control
-    @m = 2 #Mesas de 4
-    @n = 14 #Mesas de 2
-    @p = false
+    m = 2 #Mesas de 4
+    n = 14 #Mesas de 2
+    p = false
     
     # Variables de estado (COLAS)
     @ns2 = 0
@@ -46,7 +46,7 @@ class Simulador
 
     # Tiempo de inicio y final de simulación
     @t = 0
-    @tf = 180
+    tf = 180
 
     # Tiempos de atención?? no se, checkear
     @te2 = 0.0
@@ -64,12 +64,12 @@ class Simulador
     @nt2 = 0 #Mesas totales atendidas de 2.
     @nt4 = 0 #Mesas totales atendidas de 4.
     @nt6 = 0 #Mesas totales atendidas de 6.
-    @sto2 = 0 #Sumatoria de Tiempo Ocioso de mesas de 2.
-    @sto4 = 0 #Sumatoria de Tiempo Ocioso de mesas de 4.
+    @sto2 = Array.new(@m, 0) #Sumatoria de Tiempo Ocioso de mesas de 2.
+    @sto4 = Array.new(@n, 0) #Sumatoria de Tiempo Ocioso de mesas de 4.
 
  
     @cr2 = 0 #cantidad de rechazados de  grupo de 2 en mesas de 4
-    @cra2 = 0 #cantidad de rechazados de  grupo de 2 en mesas de 4 arrepentidos
+    #@cra2 = 0 #cantidad de rechazados de  grupo de 2 en mesas de 4 arrepentidos
     @c24 = 0 #cantidad aceptada de grupo de 2 en mesas de 4
 
     
@@ -129,7 +129,7 @@ class Simulador
       @tps2[@i] = @t + @te2
     else
       @ito2[@i] = @t
-      @tps2[@i] = 10_000
+      @tps2[@i] = HV
     end
     proximo_o_final
   end
@@ -154,7 +154,7 @@ class Simulador
       @tps4[@j] = @t + @te2
     else
       @ito4[@j] = @t
-      @tps4[@j] = 10_000
+      @tps4[@j] = HV
     end
     proximo_o_final
   end
@@ -365,9 +365,16 @@ class Simulador
     @pca = (@scp*180)/@t
 
     #Porcentaje de Tiempo Ocioso de Mesas
-    @pto2 = (@sto2.to_f /@t)*100
-    @pto4 = (@sto4.to_f /@t)*100
-  
+    #@pto2 = (@sto2.to_f /@t)*100
+    #@pto4 = (@sto4.to_f /@t)*100
+    
+    for i in 0..(@m-1)
+      @pto2[i] = (@sto2[i].to_f /@t)*100
+    end
+    
+    for j in 0..(@n-1)
+      @pto4[j] = (@sto4[j].to_f /@t)*100
+    end  
     #ESTO ES anterior
     @pr24 = (@cr2.to_f / (@nt4 + @nt2 + @nt6 + @cr2)) * 100
     @ps24 = (@c24.to_f / (@nt4 + @nt2 + @nt6 + @c24)) * 100
