@@ -193,6 +193,7 @@ class Simulador
     else
       cant_personas
     end
+
   end
 
   def resolver_ia
@@ -324,6 +325,7 @@ class Simulador
       @ns6 -= 1
       @nt6 -= 1
       @scp -= @cp
+    end
   end
 
   def proximo_o_final
