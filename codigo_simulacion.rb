@@ -119,15 +119,16 @@ class Simulador
 
   def atender_salida2
     @t = @tps2[@i]
-    @ns2 -= 1
-    if @ns2 < M
+    if @ns2 >= M
       @te2 = resolver_estadia_2
       @tps2[@i] = @t + @te2
+    elsif @ns2 < M  && @ns4 < N && @ns6 > 0
+      atender_salida6
     else
       @ito2[@i] = @t
       @tps2[@i] = HV
     end
-
+    @ns2 -= 1
   end
 
   def resolver_estadia_2
@@ -148,11 +149,26 @@ class Simulador
       @c24 += 1
       @te2 = resolver_estadia_2
       @tps4[@j] = @t + @te2
+    elsif @ns2 < M  && @ns4 < N && @ns6 > 0
+      atender_salida6
     else
       @ito4[@j] = @t
       @tps4[@j] = HV
     end
 
+  end
+
+  def atender_salida6
+    @ns2 += 1
+    @ns4 += 1
+    @ns6 -= 1
+    @i = tps_hv(@tps2)
+    @j = tps_hv(@tps4)
+    @sto2[@i] = @t - @ito2[@i]
+    @sto4[@j] = @t - @ito4[@j]
+    @te6 = resolver_estadia_6
+    @tps2[@i] = @t + @te6
+    @tps4[@j] = @t + @te6
   end
 
   def resolver_estadia_4
@@ -172,7 +188,6 @@ class Simulador
     @ia = resolver_ia
     @tpll = @t + @ia
 
-    # hay q cambiar esto para  dejar de  dejar a gente anotarse, como sabemos la hora del dia?
     if @t % 180 >= 140 && (@ns2 + @ns4 + @ns6) > (5 + N + M)
       proximo_o_final
     else
@@ -216,7 +231,7 @@ class Simulador
       @tps2[@i] = @t + @te2
       @sto2[@i] = (@t - @ito2[@i])
       final_llegada_2
-    elsif @ns4 <= N
+    elsif @ns4 < N
       mesa_2_en_mesa_4
     else
       arrepentimiento_2
@@ -286,22 +301,11 @@ class Simulador
   end
 
   def llegada_6p
-    if @ns6 == 0
-      @nt6 += 1
-      @scp += @cp
-      if @ns4 < N && @ns2 < M
-        @ns2 += 1
-        @ns4 += 1
-        @i = tps_hv(@tps2)
-        @j = tps_hv(@tps4)
-        @sto2[@i] = @t - @ito2[@i]
-        @sto4[@j] = @t - @ito4[@j]
-        @te6 = resolver_estadia_6
-        @tps2[@i] = @t + @te6
-        @tps4[@j] = @t + @te6
-      else
-        @ns6 += 1
-      end
+    @ns6 += 1
+    @nt6 += 1
+    @scp += @cp
+    if @ns4 < N && @ns2 < M && @ns6 == 0 
+      atender_salida6
     else
       arrepentimiento_6
     end
@@ -317,11 +321,9 @@ class Simulador
     end
     if @a6 # Se arrepiente
       @pa6 += 1
-    else
-      @nt6 += 1
-      @ns6 += 1
-      @scp += @cp
-    end
+      @ns6 -= 1
+      @nt6 -= 1
+      @scp -= @cp
   end
 
   def proximo_o_final
