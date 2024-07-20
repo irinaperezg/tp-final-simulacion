@@ -8,7 +8,7 @@ TF = 1800000
 # Variables de control
 M = 26 #Mesas de 2
 N = 2 #Mesas de 4
-P = 1
+P = true
 class Simulador
   def simular
     condiciones_iniciales
@@ -226,7 +226,7 @@ class Simulador
   end
 
   def llegada_2p
-    if @ns2 <= M
+    if @ns2 < M
       @i = tps_hv(@tps2)
       @te2 = resolver_estadia_2
       @tps2[@i] = @t + @te2
@@ -269,7 +269,7 @@ class Simulador
   end
 
   def llegada_4p
-    if @ns4 <= N
+    if @ns4 < N
       @j = tps_hv(@tps4)
       @sto4[@j] = @t - @ito4[@j]
       @te4 = resolver_estadia_4
@@ -390,21 +390,26 @@ class Simulador
     puts 'PTA4: ' + format('%.2f', @pta4.to_s) + ' %'
     puts 'PTA6: ' + format('%.2f', @pta6.to_s) + ' %'
     
-    puts 'PTO2: ' 
-    for a in 0..(M-1)
-      puts 'Mesa ' + (a+1).to_s + ': ' + format('%.2f', @pto2[a].to_s) + ' %'
-    end
-    
-    puts 'PTO4: '
-    for b in 0..(N-1)
-      puts 'Mesa ' + (b+1).to_s + ': ' + format('%.2f', @pto4[b].to_s) + ' %'
-    end
-    puts 'PPTO2: ' + format('%.2f', @ppto2.to_s) + ' %'
-    puts 'PPTO4: ' + format('%.2f', @ppto4.to_s) + ' %'
+  
+  # puts 'PTO2 individuales: ' 
+  # for a in 0..(M-1)
+  #   puts 'Mesa ' + (a+1).to_s + ': ' + format('%.2f', @pto2[a].to_s) + ' %'
+  # end
+  # 
+  # puts 'PTO4 individuales: '
+  # for b in 0..(N-1)
+  #   puts 'Mesa ' + (b+1).to_s + ': ' + format('%.2f', @pto4[b].to_s) + ' %'
+  # end
+    puts 'PTO2: ' + format('%.2f', @ppto2.to_s) + ' %'
+    puts 'PTO4: ' + format('%.2f', @ppto4.to_s) + ' %'
     puts ''
     puts 'PCA: ' + format('%.2f', @pca.to_s)
-    puts 'PR24: ' + format('%.2f', @pr24.to_s) + ' %'
-    puts 'PS24: ' + format('%.2f', @ps24.to_s) + ' %'
+    if P
+      puts 'PS24: ' + format('%.2f', @ps24.to_s) + ' %'
+    else
+      puts 'PR24: ' + format('%.2f', @pr24.to_s) + ' %'
+    end
+    
     puts ''
     puts 'Cantidad total de mesas atendidas: '
     puts ''
