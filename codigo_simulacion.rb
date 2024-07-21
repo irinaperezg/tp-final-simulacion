@@ -6,8 +6,8 @@ HV = 99999999999999999999999999
 TF = 1800000
 
 # Variables de control
-M = 26 #Mesas de 2
-N = 2 #Mesas de 4
+M = 18 #Mesas de 2
+N = 6 #Mesas de 4
 P = true
 class Simulador
   def simular
@@ -254,7 +254,7 @@ class Simulador
       @j = tps_hv(@tps4)
       @te2 = resolver_estadia_2
       @tps4[@j] = @t + @te2
-      @sto4[@j] = @t - @ito4[@i]
+      @sto4[@j] = @t - @ito4[@j]
       final_llegada_4
     else #flag desactivado
       @cr2 += 1
