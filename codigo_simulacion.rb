@@ -140,7 +140,7 @@ class Simulador
   def atender_salida4
     @t = @tps4[@j]
     @ns4 -= 1
-    if @ns4 <= N
+    if @ns4 >= N
       @te4 = resolver_estadia_4
       @tps4[@j] = @t + @te4
     elsif @ns2 >= M && P == true
